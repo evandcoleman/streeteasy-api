@@ -3,7 +3,7 @@ import { StreetEasyClient } from "../index";
 import { Areas, Amenities } from "../constants";
 import { SEARCH_RENTALS_QUERY } from "../queries";
 import type { SearchRentalsInput } from "../types";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 // Create a ClientError class for testing
 class ClientError extends Error {
@@ -29,8 +29,8 @@ class ClientError extends Error {
 jest.mock("graphql-request");
 
 // Mock the UUID library
-jest.mock('uuid', () => ({
-  v4: jest.fn(() => 'mock-uuid'),
+jest.mock("uuid", () => ({
+  v4: jest.fn(() => "mock-uuid"),
 }));
 
 describe("StreetEasyClient", () => {
@@ -257,8 +257,8 @@ describe("StreetEasyClient", () => {
       expect(mockClient.request).toHaveBeenCalledWith(SEARCH_RENTALS_QUERY, {
         input: {
           ...params,
-          adStrategy: 'NONE',
-          userSearchToken: 'mock-uuid',
+          adStrategy: "NONE",
+          userSearchToken: "mock-uuid",
         },
       });
     });
@@ -302,8 +302,8 @@ describe("StreetEasyClient", () => {
       expect(mockClient.request).toHaveBeenCalledWith(SEARCH_RENTALS_QUERY, {
         input: {
           ...params,
-          adStrategy: 'NONE',
-          userSearchToken: 'mock-uuid',
+          adStrategy: "NONE",
+          userSearchToken: "mock-uuid",
         },
       });
     });
@@ -323,7 +323,7 @@ describe("StreetEasyClient", () => {
       client = new StreetEasyClient();
       const params = {
         filters: {},
-        adStrategy: 'NONE' as const,
+        adStrategy: "NONE" as const,
       };
 
       await client.searchRentals(params);
@@ -331,11 +331,11 @@ describe("StreetEasyClient", () => {
       expect(mockClient.request).toHaveBeenCalledWith(SEARCH_RENTALS_QUERY, {
         input: {
           ...params,
-          userSearchToken: 'mock-uuid',
+          userSearchToken: "mock-uuid",
         },
       });
     });
-    
+
     it("should not override userSearchToken if already provided", async () => {
       const mockClient = {
         request: jest.fn().mockResolvedValue({
@@ -351,7 +351,7 @@ describe("StreetEasyClient", () => {
       client = new StreetEasyClient();
       const params = {
         filters: {},
-        userSearchToken: 'custom-token',
+        userSearchToken: "custom-token",
       };
 
       await client.searchRentals(params);
@@ -359,7 +359,7 @@ describe("StreetEasyClient", () => {
       expect(mockClient.request).toHaveBeenCalledWith(SEARCH_RENTALS_QUERY, {
         input: {
           ...params,
-          adStrategy: 'NONE',
+          adStrategy: "NONE",
         },
       });
     });

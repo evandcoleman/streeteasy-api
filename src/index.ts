@@ -7,7 +7,7 @@ import {
   SearchRentalsResponse,
 } from "./types";
 import { SEARCH_RENTALS_QUERY } from "./queries";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export interface StreetEasyConfig {
   endpoint?: string;
@@ -80,11 +80,13 @@ export class StreetEasyClient {
     // Set default userSearchToken to a UUID if not provided
     const inputWithDefaults = {
       ...input,
-      adStrategy: input.adStrategy || 'NONE',
+      adStrategy: input.adStrategy || "NONE",
       userSearchToken: input.userSearchToken || uuidv4(),
     };
 
-    return this.request<SearchRentalsResponse>(SEARCH_RENTALS_QUERY, { input: inputWithDefaults });
+    return this.request<SearchRentalsResponse>(SEARCH_RENTALS_QUERY, {
+      input: inputWithDefaults,
+    });
   }
 }
 
