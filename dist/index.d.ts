@@ -1,5 +1,5 @@
-import { DocumentNode } from 'graphql';
-import { Variables, SearchRentalsInput, SearchRentalsResponse } from './types';
+import { DocumentNode } from "graphql";
+import { Variables, SearchRentalsInput, SearchRentalsResponse } from "./types";
 export interface StreetEasyConfig {
     endpoint?: string;
 }
@@ -21,4 +21,4 @@ export declare class StreetEasyClient {
      */
     searchRentals(input: SearchRentalsInput): Promise<SearchRentalsResponse>;
 }
-export * from './types';
+export * from "./types";

@@ -32,5 +32,5 @@ export declare const Amenities: Readonly<{
     STORAGE_SPACE: "STORAGE_SPACE";
     GUARANTORS_ACCEPTED: "GUARANTORS_ACCEPTED";
 }>;
-export type AreaCode = typeof Areas[keyof typeof Areas];
-export type Amenity = typeof Amenities[keyof typeof Amenities];
+export type AreaCode = (typeof Areas)[keyof typeof Areas];
+export type Amenity = (typeof Amenities)[keyof typeof Amenities];

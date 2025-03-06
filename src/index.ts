@@ -56,15 +56,9 @@ export class StreetEasyClient {
     variables?: Variables,
   ): Promise<TData> {
     try {
-      console.log("Making request with:", {
-        document: typeof document === "string" ? document : "DocumentNode",
-        variables,
-      });
       const response = await this.client.request<TData>(document, variables);
-      console.log("Received response:", JSON.stringify(response, null, 2));
       return response;
     } catch (error) {
-      console.error("Request error:", error);
       if (error instanceof Error) {
         throw new Error(`StreetEasy GraphQL Error: ${error.message}`);
       }

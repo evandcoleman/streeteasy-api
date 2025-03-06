@@ -1,5 +1,5 @@
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { AreaCode, Amenity } from './constants';
+import { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import { AreaCode, Amenity } from "./constants";
 export interface ApiResponse<T> {
     status: number;
     data: T;
@@ -25,7 +25,7 @@ export type QueryResponse<T> = {
     errors?: GraphQLError[];
 };
 export type Variables = Record<string, unknown>;
-export type BuildingType = 'CO_OP' | 'CONDO' | 'MULTI_FAMILY' | 'RENTAL' | 'TOWNHOUSE';
+export type BuildingType = "CO_OP" | "CONDO" | "MULTI_FAMILY" | "RENTAL" | "TOWNHOUSE";
 export interface GeoPoint {
     latitude: number;
     longitude: number;
@@ -69,7 +69,7 @@ export interface NumberRange {
 }
 export interface SearchFilters {
     areas?: AreaCode[];
-    rentalStatus?: 'ACTIVE';
+    rentalStatus?: "ACTIVE";
     price?: NumberRange;
     bedrooms?: NumberRange;
     bathrooms?: NumberRange;
@@ -77,12 +77,12 @@ export interface SearchFilters {
     petsAllowed?: boolean;
 }
 export interface Sorting {
-    attribute: 'RECOMMENDED' | 'PRICE' | 'DATE_LISTED';
-    direction: 'ASCENDING' | 'DESCENDING';
+    attribute: "RECOMMENDED" | "PRICE" | "DATE_LISTED";
+    direction: "ASCENDING" | "DESCENDING";
 }
 export interface SearchRentalsInput {
     sorting?: Sorting;
-    adStrategy?: 'NONE';
+    adStrategy?: "NONE";
     filters: SearchFilters;
     perPage?: number;
     page?: number;
