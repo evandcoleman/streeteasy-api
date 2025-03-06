@@ -75,10 +75,12 @@ class StreetEasyClient {
         // Set default userSearchToken to a UUID if not provided
         const inputWithDefaults = {
             ...input,
-            adStrategy: input.adStrategy || 'NONE',
+            adStrategy: input.adStrategy || "NONE",
             userSearchToken: input.userSearchToken || (0, uuid_1.v4)(),
         };
-        return this.request(queries_1.SEARCH_RENTALS_QUERY, { input: inputWithDefaults });
+        return this.request(queries_1.SEARCH_RENTALS_QUERY, {
+            input: inputWithDefaults,
+        });
     }
 }
 exports.StreetEasyClient = StreetEasyClient;

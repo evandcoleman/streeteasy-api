@@ -15,8 +15,8 @@ class ClientError extends Error {
 // Mock GraphQLClient
 jest.mock("graphql-request");
 // Mock the UUID library
-jest.mock('uuid', () => ({
-    v4: jest.fn(() => 'mock-uuid'),
+jest.mock("uuid", () => ({
+    v4: jest.fn(() => "mock-uuid"),
 }));
 describe("StreetEasyClient", () => {
     let client;
@@ -185,8 +185,8 @@ describe("StreetEasyClient", () => {
             expect(mockClient.request).toHaveBeenCalledWith(queries_1.SEARCH_RENTALS_QUERY, {
                 input: {
                     ...params,
-                    adStrategy: 'NONE',
-                    userSearchToken: 'mock-uuid',
+                    adStrategy: "NONE",
+                    userSearchToken: "mock-uuid",
                 },
             });
         });
@@ -219,8 +219,8 @@ describe("StreetEasyClient", () => {
             expect(mockClient.request).toHaveBeenCalledWith(queries_1.SEARCH_RENTALS_QUERY, {
                 input: {
                     ...params,
-                    adStrategy: 'NONE',
-                    userSearchToken: 'mock-uuid',
+                    adStrategy: "NONE",
+                    userSearchToken: "mock-uuid",
                 },
             });
         });
@@ -237,13 +237,13 @@ describe("StreetEasyClient", () => {
             client = new index_1.StreetEasyClient();
             const params = {
                 filters: {},
-                adStrategy: 'NONE',
+                adStrategy: "NONE",
             };
             await client.searchRentals(params);
             expect(mockClient.request).toHaveBeenCalledWith(queries_1.SEARCH_RENTALS_QUERY, {
                 input: {
                     ...params,
-                    userSearchToken: 'mock-uuid',
+                    userSearchToken: "mock-uuid",
                 },
             });
         });
@@ -260,13 +260,13 @@ describe("StreetEasyClient", () => {
             client = new index_1.StreetEasyClient();
             const params = {
                 filters: {},
-                userSearchToken: 'custom-token',
+                userSearchToken: "custom-token",
             };
             await client.searchRentals(params);
             expect(mockClient.request).toHaveBeenCalledWith(queries_1.SEARCH_RENTALS_QUERY, {
                 input: {
                     ...params,
-                    adStrategy: 'NONE',
+                    adStrategy: "NONE",
                 },
             });
         });
