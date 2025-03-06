@@ -1,0 +1,54 @@
+{
+  "name": "streeteasy-api",
+  "version": "0.1.1",
+  "description": "TypeScript API client for StreetEasy",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "yarn clean && yarn build",
+    "prepublishOnly": "yarn test && yarn lint",
+    "preversion": "yarn lint",
+    "version": "yarn format && git add -A src",
+    "postversion": "git push && git push --tags",
+    "publish:npm": "yarn clean && yarn build && npm publish",
+    "example": "ts-node examples/search-rentals.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:integration": "jest integration.test.ts --config jest.config.js --runInBand --no-cache",
+    "lint": "eslint . --ext .ts"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evandcoleman/streeteasy-api"
+  },
+  "keywords": [
+    "streeteasy",
+    "api",
+    "real estate",
+    "nyc"
+  ],
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.24",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.1",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "graphql": "^16.8.1",
+    "graphql-request": "^5.2.0"
+  }
+}
