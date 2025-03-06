@@ -14,6 +14,10 @@ class ClientError extends Error {
 }
 // Mock GraphQLClient
 jest.mock("graphql-request");
+// Mock the UUID library
+jest.mock('uuid', () => ({
+    v4: jest.fn(() => 'mock-uuid'),
+}));
 describe("StreetEasyClient", () => {
     let client;
     beforeEach(() => {
@@ -179,7 +183,11 @@ describe("StreetEasyClient", () => {
             const response = await client.searchRentals(params);
             expect(response.searchRentals).toBeDefined();
             expect(mockClient.request).toHaveBeenCalledWith(queries_1.SEARCH_RENTALS_QUERY, {
-                input: params,
+                input: {
+                    ...params,
+                    adStrategy: 'NONE',
+                    userSearchToken: 'mock-uuid',
+                },
             });
         });
         it("should handle search errors", async () => {
@@ -192,6 +200,75 @@ describe("StreetEasyClient", () => {
                 filters: {},
             };
             await expect(client.searchRentals(params)).rejects.toThrow("StreetEasy GraphQL Error: API Error");
+        });
+        it("should set adStrategy to 'NONE' by default", async () => {
+            const mockClient = {
+                request: jest.fn().mockResolvedValue({
+                    searchRentals: {
+                        totalCount: 1,
+                        edges: [],
+                    },
+                }),
+            };
+            graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+            client = new index_1.StreetEasyClient();
+            const params = {
+                filters: {},
+            };
+            await client.searchRentals(params);
+            expect(mockClient.request).toHaveBeenCalledWith(queries_1.SEARCH_RENTALS_QUERY, {
+                input: {
+                    ...params,
+                    adStrategy: 'NONE',
+                    userSearchToken: 'mock-uuid',
+                },
+            });
+        });
+        it("should not override adStrategy if already provided", async () => {
+            const mockClient = {
+                request: jest.fn().mockResolvedValue({
+                    searchRentals: {
+                        totalCount: 1,
+                        edges: [],
+                    },
+                }),
+            };
+            graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+            client = new index_1.StreetEasyClient();
+            const params = {
+                filters: {},
+                adStrategy: 'NONE',
+            };
+            await client.searchRentals(params);
+            expect(mockClient.request).toHaveBeenCalledWith(queries_1.SEARCH_RENTALS_QUERY, {
+                input: {
+                    ...params,
+                    userSearchToken: 'mock-uuid',
+                },
+            });
+        });
+        it("should not override userSearchToken if already provided", async () => {
+            const mockClient = {
+                request: jest.fn().mockResolvedValue({
+                    searchRentals: {
+                        totalCount: 1,
+                        edges: [],
+                    },
+                }),
+            };
+            graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+            client = new index_1.StreetEasyClient();
+            const params = {
+                filters: {},
+                userSearchToken: 'custom-token',
+            };
+            await client.searchRentals(params);
+            expect(mockClient.request).toHaveBeenCalledWith(queries_1.SEARCH_RENTALS_QUERY, {
+                input: {
+                    ...params,
+                    adStrategy: 'NONE',
+                },
+            });
         });
     });
 });

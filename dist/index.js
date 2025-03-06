@@ -17,6 +17,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StreetEasyClient = void 0;
 const graphql_request_1 = require("graphql-request");
 const queries_1 = require("./queries");
+const uuid_1 = require("uuid");
 class StreetEasyClient {
     constructor(config = {}) {
         this.endpoint = "https://api-v6.streeteasy.com/";
@@ -70,7 +71,14 @@ class StreetEasyClient {
      * @returns Search results
      */
     async searchRentals(input) {
-        return this.request(queries_1.SEARCH_RENTALS_QUERY, { input });
+        // Set default adStrategy to 'NONE' if not provided
+        // Set default userSearchToken to a UUID if not provided
+        const inputWithDefaults = {
+            ...input,
+            adStrategy: input.adStrategy || 'NONE',
+            userSearchToken: input.userSearchToken || (0, uuid_1.v4)(),
+        };
+        return this.request(queries_1.SEARCH_RENTALS_QUERY, { input: inputWithDefaults });
     }
 }
 exports.StreetEasyClient = StreetEasyClient;
