@@ -34,4 +34,4 @@ export const SEARCH_RENTALS_QUERY = `
       }
     }
   }
-`; 
+`;

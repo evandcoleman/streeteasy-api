@@ -1,5 +1,5 @@
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { AreaCode, Amenity } from './constants';
+import { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import { AreaCode, Amenity } from "./constants";
 
 // Base response interface
 export interface ApiResponse<T> {
@@ -40,10 +40,15 @@ export type QueryResponse<T> = {
 // Helper type for variables
 export type Variables = Record<string, unknown>;
 
-// We'll add more specific types here as we implement the API endpoints 
+// We'll add more specific types here as we implement the API endpoints
 
 // Rental Search Types
-export type BuildingType = 'CO_OP' | 'CONDO' | 'MULTI_FAMILY' | 'RENTAL' | 'TOWNHOUSE';
+export type BuildingType =
+  | "CO_OP"
+  | "CONDO"
+  | "MULTI_FAMILY"
+  | "RENTAL"
+  | "TOWNHOUSE";
 
 export interface GeoPoint {
   latitude: number;
@@ -94,7 +99,7 @@ export interface NumberRange {
 
 export interface SearchFilters {
   areas?: AreaCode[];
-  rentalStatus?: 'ACTIVE';
+  rentalStatus?: "ACTIVE";
   price?: NumberRange;
   bedrooms?: NumberRange;
   bathrooms?: NumberRange;
@@ -103,13 +108,13 @@ export interface SearchFilters {
 }
 
 export interface Sorting {
-  attribute: 'RECOMMENDED' | 'PRICE' | 'DATE_LISTED';
-  direction: 'ASCENDING' | 'DESCENDING';
+  attribute: "RECOMMENDED" | "PRICE" | "DATE_LISTED";
+  direction: "ASCENDING" | "DESCENDING";
 }
 
 export interface SearchRentalsInput {
   sorting?: Sorting;
-  adStrategy?: 'NONE';
+  adStrategy?: "NONE";
   filters: SearchFilters;
   perPage?: number;
   page?: number;
@@ -121,4 +126,4 @@ export interface RentalSearchVariables {
 }
 
 // Re-export useful GraphQL types
-export type { TypedDocumentNode }; 
+export type { TypedDocumentNode };
