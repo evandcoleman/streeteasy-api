@@ -5,8 +5,10 @@ import {
   Variables,
   SearchRentalsInput,
   SearchRentalsResponse,
+  RentalListingDetailsResponse,
+  RentalListingDetailsVariables,
 } from "./types";
-import { SEARCH_RENTALS_QUERY } from "./queries";
+import { SEARCH_RENTALS_QUERY, RENTAL_LISTING_DETAILS_QUERY } from "./queries";
 import { v4 as uuidv4 } from "uuid";
 
 export interface StreetEasyConfig {
@@ -87,6 +89,20 @@ export class StreetEasyClient {
     return this.request<SearchRentalsResponse>(SEARCH_RENTALS_QUERY, {
       input: inputWithDefaults,
     });
+  }
+
+  /**
+   * Get detailed information about a specific rental listing
+   * @param listingID The ID of the rental listing to fetch
+   * @returns Detailed rental listing information
+   */
+  public async getRentalListingDetails(
+    listingID: string
+  ): Promise<RentalListingDetailsResponse> {
+    return this.request<RentalListingDetailsResponse>(
+      RENTAL_LISTING_DETAILS_QUERY,
+      { listingID }
+    );
   }
 }
 

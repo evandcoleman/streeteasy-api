@@ -82,6 +82,14 @@ class StreetEasyClient {
             input: inputWithDefaults,
         });
     }
+    /**
+     * Get detailed information about a specific rental listing
+     * @param listingID The ID of the rental listing to fetch
+     * @returns Detailed rental listing information
+     */
+    async getRentalListingDetails(listingID) {
+        return this.request(queries_1.RENTAL_LISTING_DETAILS_QUERY, { listingID });
+    }
 }
 exports.StreetEasyClient = StreetEasyClient;
 // Export types

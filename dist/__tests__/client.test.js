@@ -271,4 +271,293 @@ describe("StreetEasyClient", () => {
             });
         });
     });
+    describe("getRentalListingDetails", () => {
+        beforeEach(() => {
+            client = new index_1.StreetEasyClient();
+        });
+        it("should fetch rental listing details", async () => {
+            const mockResponse = {
+                rentalByListingId: {
+                    id: "4652509",
+                    status: "ACTIVE",
+                    propertyDetails: {
+                        address: {
+                            street: "123 Main St",
+                            unit: "4B"
+                        },
+                        bedroomCount: 2,
+                        fullBathroomCount: 1,
+                        halfBathroomCount: 0
+                    },
+                    pricing: {
+                        price: 3500,
+                        noFee: true
+                    }
+                },
+                buildingByRentalListingId: {
+                    name: "Test Building",
+                    type: "CONDO",
+                    area: {
+                        name: "Manhattan"
+                    }
+                }
+            };
+            const mockClient = {
+                request: jest.fn().mockResolvedValue(mockResponse),
+            };
+            graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+            client = new index_1.StreetEasyClient();
+            const listingID = "4652509";
+            const response = await client.getRentalListingDetails(listingID);
+            expect(response).toEqual(mockResponse);
+            expect(mockClient.request).toHaveBeenCalledWith(queries_1.RENTAL_LISTING_DETAILS_QUERY, { listingID });
+        });
+        it("should handle errors when fetching rental details", async () => {
+            const mockClient = {
+                request: jest.fn().mockRejectedValue(new Error("API Error")),
+            };
+            graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+            client = new index_1.StreetEasyClient();
+            const listingID = "4652509";
+            await expect(client.getRentalListingDetails(listingID)).rejects.toThrow("StreetEasy GraphQL Error: API Error");
+        });
+        it("should handle partial or missing data in the response", async () => {
+            // Mock response with some null or missing fields
+            const mockResponse = {
+                rentalByListingId: {
+                    id: "4652509",
+                    status: "ACTIVE",
+                    offMarketAt: null,
+                    availableAt: null,
+                    propertyDetails: {
+                        address: {
+                            street: "123 Main St",
+                            unit: null
+                        },
+                        bedroomCount: 2,
+                        fullBathroomCount: 1,
+                        halfBathroomCount: 0
+                    },
+                    pricing: {
+                        price: 3500,
+                        noFee: true
+                    },
+                    media: {
+                        photos: [],
+                        floorPlans: null
+                    }
+                },
+                buildingByRentalListingId: {
+                    name: "Test Building",
+                    type: "CONDO",
+                    area: {
+                        name: "Manhattan"
+                    }
+                },
+                getRelloRentalById: null
+            };
+            const mockClient = {
+                request: jest.fn().mockResolvedValue(mockResponse),
+            };
+            graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+            client = new index_1.StreetEasyClient();
+            const listingID = "4652509";
+            const response = await client.getRentalListingDetails(listingID);
+            expect(response).toEqual(mockResponse);
+            // Verify we can handle null values
+            expect(response.rentalByListingId.offMarketAt).toBeNull();
+            expect(response.rentalByListingId.propertyDetails.address.unit).toBeNull();
+            expect(response.rentalByListingId.media.floorPlans).toBeNull();
+            expect(response.getRelloRentalById).toBeNull();
+        });
+        it("should pass the correct listing ID to the request", async () => {
+            const mockResponse = { data: "test" };
+            const mockClient = {
+                request: jest.fn().mockResolvedValue(mockResponse),
+            };
+            graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+            client = new index_1.StreetEasyClient();
+            // Test with a numeric listing ID as string
+            await client.getRentalListingDetails("12345");
+            expect(mockClient.request).toHaveBeenCalledWith(queries_1.RENTAL_LISTING_DETAILS_QUERY, { listingID: "12345" });
+            // Reset the mock and test with another ID
+            mockClient.request.mockClear();
+            await client.getRentalListingDetails("abc-123");
+            expect(mockClient.request).toHaveBeenCalledWith(queries_1.RENTAL_LISTING_DETAILS_QUERY, { listingID: "abc-123" });
+        });
+        it("should handle a complete response with all nested objects", async () => {
+            // Mock a complete response with all nested objects from the schema
+            const mockResponse = {
+                rentalByListingId: {
+                    __typename: "RentalListing",
+                    id: "4652509",
+                    offMarketAt: null,
+                    availableAt: "2024-05-15",
+                    buildingId: "12345",
+                    status: "ACTIVE",
+                    statusChanges: [
+                        {
+                            __typename: "RentalStatusChange",
+                            status: "ACTIVE",
+                            changedAt: "2024-04-01T12:00:00Z"
+                        }
+                    ],
+                    createdAt: "2024-04-01T12:00:00Z",
+                    updatedAt: "2024-04-01T12:00:00Z",
+                    interestingChangeAt: "2024-04-01T12:00:00Z",
+                    description: "Nice apartment",
+                    media: {
+                        __typename: "Media",
+                        photos: [
+                            {
+                                __typename: "Photo",
+                                key: "photo1"
+                            }
+                        ],
+                        floorPlans: [
+                            {
+                                __typename: "FloorPlan",
+                                key: "floorplan1"
+                            }
+                        ],
+                        videos: [],
+                        tour3dUrl: null,
+                        assetCount: 2
+                    },
+                    propertyDetails: {
+                        __typename: "PropertyDetails",
+                        address: {
+                            __typename: "Address",
+                            street: "123 Main St",
+                            houseNumber: "123",
+                            streetName: "Main St",
+                            city: "New York",
+                            state: "NY",
+                            zipCode: "10001",
+                            unit: "4B"
+                        },
+                        roomCount: 3,
+                        bedroomCount: 1,
+                        fullBathroomCount: 1,
+                        halfBathroomCount: 0,
+                        livingAreaSize: 750,
+                        amenities: {
+                            __typename: "BuildingAmenities",
+                            list: ["DOORMAN", "ELEVATOR"],
+                            doormanTypes: [],
+                            parkingTypes: [],
+                            sharedOutdoorSpaceTypes: [],
+                            storageSpaceTypes: []
+                        },
+                        features: {
+                            __typename: "PropertyFeatures",
+                            list: ["HARDWOOD_FLOORS", "DISHWASHER"],
+                            fireplaceTypes: [],
+                            privateOutdoorSpaceTypes: [],
+                            views: []
+                        }
+                    },
+                    mlsNumber: null,
+                    backOffice: {
+                        __typename: "RentalBackOffice",
+                        brokerageListingId: null
+                    },
+                    pricing: {
+                        __typename: "RentalPricing",
+                        leaseTermMonths: 12,
+                        monthsFree: null,
+                        noFee: true,
+                        price: 3500,
+                        priceDelta: null,
+                        priceChanges: []
+                    },
+                    recentListingsPriceStats: {
+                        __typename: "NeighborhoodPriceStats",
+                        rentalPriceStats: {
+                            __typename: "PriceStats",
+                            medianPrice: 3400
+                        },
+                        salePriceStats: {
+                            __typename: "PriceStats",
+                            medianPrice: 750000
+                        }
+                    },
+                    upcomingOpenHouses: [],
+                    listingSource: {
+                        __typename: "ListingSource",
+                        sourceType: "BROKER"
+                    },
+                    propertyHistory: []
+                },
+                buildingByRentalListingId: {
+                    __typename: "Building",
+                    id: "12345",
+                    name: "The Building",
+                    type: "CONDO",
+                    residentialUnitCount: 100,
+                    yearBuilt: 2000,
+                    status: "COMPLETED",
+                    additionalDetails: {
+                        __typename: "BuildingAdditionalDetails",
+                        leasingStartDate: null,
+                        salesStartDate: null
+                    },
+                    address: {
+                        __typename: "Address",
+                        street: "123 Main St",
+                        city: "New York",
+                        state: "NY",
+                        zipCode: "10001"
+                    },
+                    heroImage: null,
+                    media: {
+                        __typename: "Media",
+                        photos: []
+                    },
+                    complex: null,
+                    area: {
+                        __typename: "Area",
+                        name: "Manhattan"
+                    },
+                    saleInventorySummary: {
+                        __typename: "SaleInventorySummary",
+                        availableListingDigests: []
+                    },
+                    rentalInventorySummary: {
+                        __typename: "RentalInventorySummary",
+                        availableListingDigests: []
+                    },
+                    isLandLease: null,
+                    policies: null,
+                    nearby: {
+                        __typename: "Nearby",
+                        transitStations: []
+                    }
+                },
+                getBuildingExpressByRentalListingId: {
+                    __typename: "BuildingExpress",
+                    nearbySchools: []
+                },
+                getRelloRentalById: null,
+                getRentalListingExpressById: {
+                    __typename: "RentalListingExpress",
+                    hasActiveBuildingShowcase: false
+                }
+            };
+            const mockClient = {
+                request: jest.fn().mockResolvedValue(mockResponse),
+            };
+            graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+            client = new index_1.StreetEasyClient();
+            const listingID = "4652509";
+            const response = await client.getRentalListingDetails(listingID);
+            expect(response).toEqual(mockResponse);
+            // Verify we can access all the nested properties
+            expect(response.rentalByListingId.id).toBe("4652509");
+            expect(response.rentalByListingId.propertyDetails.address.city).toBe("New York");
+            expect(response.rentalByListingId.media.photos[0].key).toBe("photo1");
+            expect(response.buildingByRentalListingId.type).toBe("CONDO");
+            expect(response.getRentalListingExpressById.hasActiveBuildingShowcase).toBe(false);
+        });
+    });
 });

@@ -18,10 +18,11 @@
     "postversion": "git push && git push --tags",
     "publish:npm": "yarn clean && yarn build && npm publish",
     "example": "ts-node examples/search-rentals.ts",
+    "example:details": "ts-node examples/rental-details.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:integration": "jest integration.test.ts --config jest.config.js --runInBand --no-cache",
+    "test:integration": "ts-node examples/integration-test.ts",
     "lint": "eslint . --ext .ts"
   },
   "license": "MIT",
