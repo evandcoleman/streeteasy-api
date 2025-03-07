@@ -97,11 +97,11 @@ export class StreetEasyClient {
    * @returns Detailed rental listing information
    */
   public async getRentalListingDetails(
-    listingID: string
+    listingID: string,
   ): Promise<RentalListingDetailsResponse> {
     return this.request<RentalListingDetailsResponse>(
       RENTAL_LISTING_DETAILS_QUERY,
-      { listingID }
+      { listingID },
     );
   }
 }
