@@ -51,44 +51,102 @@ export type BuildingType =
   | "TOWNHOUSE";
 
 export interface GeoPoint {
+  __typename: string;
   latitude: number;
   longitude: number;
 }
 
-export interface LeadMedia {
-  photo: {
-    key: string;
-  };
+export interface LeadMediaPhoto {
+  __typename: string;
+  key: string;
 }
 
-export interface RentalListing {
+export interface LeadMediaFloorPlan {
+  __typename: string;
+  key: string;
+}
+
+export interface LeadMedia {
+  __typename: string;
+  photo: LeadMediaPhoto;
+  floorPlan?: LeadMediaFloorPlan;
+}
+
+export interface OpenHouseDigest {
+  __typename: string;
+  startTime: string;
+  endTime: string;
+  appointmentOnly: boolean;
+}
+
+export interface SearchRentalListing {
+  __typename: string;
   id: string;
   areaName: string;
+  availableAt: string | null;
   bedroomCount: number;
   buildingType: BuildingType;
   fullBathroomCount: number;
+  furnished: boolean;
   geoPoint: GeoPoint;
   halfBathroomCount: number;
-  noFee: boolean;
+  hasTour3d: boolean;
+  hasVideos: boolean;
+  isNewDevelopment: boolean;
   leadMedia: LeadMedia;
+  leaseTermMonths: number | null;
+  livingAreaSize: number | null;
+  mediaAssetCount: number;
+  monthsFree: number | null;
+  noFee: boolean;
+  netEffectivePrice: number | null;
+  offMarketAt: string | null;
+  photos: LeadMediaPhoto[];
   price: number;
+  priceChangedAt: string | null;
+  priceDelta: number | null;
+  slug: string;
   sourceGroupLabel: string;
+  sourceType: string;
+  status: string;
   street: string;
   unit: string;
+  upcomingOpenHouse: OpenHouseDigest | null;
   urlPath: string;
 }
 
-export interface RentalEdge {
-  node: RentalListing;
+export interface OrganicRentalEdge {
+  __typename: string;
+  node: SearchRentalListing;
+  amenitiesMatch: boolean;
+  matchedAmenities: string[];
+  missingAmenities: string[];
 }
+
+export interface FeaturedRentalEdge {
+  __typename: string;
+  node: SearchRentalListing;
+  amenitiesMatch: boolean;
+  matchedAmenities: string[];
+  missingAmenities: string[];
+}
+
+export interface SponsoredRentalEdge {
+  __typename: string;
+  node: SearchRentalListing;
+  sponsoredSimilarityLabel: string;
+}
+
+export type RentalEdge =
+  | OrganicRentalEdge
+  | FeaturedRentalEdge
+  | SponsoredRentalEdge;
 
 export interface SearchRentalsResponse {
   searchRentals: {
-    search: {
-      criteria: string;
-    };
-    totalCount: number;
+    __typename: string;
     edges: RentalEdge[];
+    totalCount: number;
   };
 }
 

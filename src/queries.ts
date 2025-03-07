@@ -1,39 +1,103 @@
 export const SEARCH_RENTALS_QUERY = `
-  query GetListingRental($input: SearchRentalsInput!) {
-    searchRentals(input: $input) {
-      search {
-        criteria
-      }
-      totalCount
-      edges {
-        ... on OrganicRentalEdge {
-          node {
-            id
-            areaName
-            bedroomCount
-            buildingType
-            fullBathroomCount
-            geoPoint {
-              latitude
-              longitude
-            }
-            halfBathroomCount
-            noFee
-            leadMedia {
-              photo {
-                key
-              }
-            }
-            price
-            sourceGroupLabel
-            street
-            unit
-            urlPath
-          }
+query SearchRentalsFederated($input: SearchRentalsInput!) {
+  searchRentals(input: $input) {
+    __typename
+    edges {
+      __typename
+      ... on OrganicRentalEdge {
+        node {
+          __typename
+          ...RentalListingDigestForSearchResults
         }
+        amenitiesMatch
+        matchedAmenities
+        missingAmenities
+      }
+      ... on FeaturedRentalEdge {
+        node {
+          __typename
+          ...RentalListingDigestForSearchResults
+        }
+        amenitiesMatch
+        matchedAmenities
+        missingAmenities
+      }
+      ... on SponsoredRentalEdge {
+        node {
+          __typename
+          ...RentalListingDigestForSearchResults
+        }
+        sponsoredSimilarityLabel
       }
     }
+    totalCount
   }
+}
+fragment LeadMediaForSRP on LeadMedia {
+  __typename
+  photo {
+    __typename
+    key
+  }
+  floorPlan {
+    __typename
+    key
+  }
+}
+fragment OpenHouseForSRP on OpenHouseDigest {
+  __typename
+  startTime
+  endTime
+  appointmentOnly
+}
+fragment RentalListingDigestForSearchResults on SearchRentalListing {
+  __typename
+  id
+  areaName
+  availableAt
+  bedroomCount
+  buildingType
+  fullBathroomCount
+  furnished
+  geoPoint {
+    __typename
+    latitude
+    longitude
+  }
+  halfBathroomCount
+  hasTour3d
+  hasVideos
+  isNewDevelopment
+  leadMedia {
+    __typename
+    ...LeadMediaForSRP
+  }
+  leaseTermMonths
+  livingAreaSize
+  mediaAssetCount
+  monthsFree
+  noFee
+  netEffectivePrice
+  offMarketAt
+  photos {
+    __typename
+    key
+  }
+  price
+  priceChangedAt
+  priceDelta
+  slug
+  sourceGroupLabel
+  sourceType
+  status
+  street
+  unit
+  upcomingOpenHouse {
+    __typename
+    ...OpenHouseForSRP
+  }
+  urlPath
+}
 `;
 
 export const RENTAL_LISTING_DETAILS_QUERY = `

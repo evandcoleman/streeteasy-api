@@ -1,5 +1,15 @@
 import { StreetEasyClient } from '../src';
 import { Areas } from '../src/constants';
+import { SearchRentalListing, OrganicRentalEdge, FeaturedRentalEdge, SponsoredRentalEdge, RentalEdge } from '../src/types';
+
+// Type guard functions
+function isOrganicOrFeaturedEdge(edge: RentalEdge): edge is OrganicRentalEdge | FeaturedRentalEdge {
+  return edge.__typename === "OrganicRentalEdge" || edge.__typename === "FeaturedRentalEdge";
+}
+
+function isSponsoredEdge(edge: RentalEdge): edge is SponsoredRentalEdge {
+  return edge.__typename === "SponsoredRentalEdge";
+}
 
 /**
  * This file performs integration testing against the actual StreetEasy API.
@@ -37,14 +47,17 @@ async function main() {
     });
     
     const totalListings = searchResponse.searchRentals.totalCount;
-    const listings = searchResponse.searchRentals.edges;
+    const edges = searchResponse.searchRentals.edges;
     
     console.log(`✅ Search successful! Found ${totalListings} total listings`);
-    console.log(`Retrieved ${listings.length} listings in the response`);
+    console.log(`Retrieved ${edges.length} listings in the response`);
     
-    if (listings.length > 0) {
+    if (edges.length > 0) {
+      const firstEdge = edges[0];
+      const sample = firstEdge.node;
+      
       console.log('\nSample listing:');
-      const sample = listings[0].node;
+      console.log(`- Edge Type: ${firstEdge.__typename}`);
       console.log(`- ID: ${sample.id}`);
       console.log(`- Area: ${sample.areaName}`);
       console.log(`- Type: ${sample.buildingType}`);
@@ -52,11 +65,22 @@ async function main() {
       console.log(`- Bathrooms: ${sample.fullBathroomCount}`);
       console.log(`- Price: $${sample.price}`);
       console.log(`- Fee: ${sample.noFee ? 'NO FEE' : 'FEE'}`);
+      console.log(`- Available: ${sample.availableAt || 'Immediately'}`);
+      
+      if (isOrganicOrFeaturedEdge(firstEdge)) {
+        console.log(`- Amenities Match: ${firstEdge.amenitiesMatch ? 'Yes' : 'No'}`);
+        console.log(`- Matched Amenities: ${firstEdge.matchedAmenities.length}`);
+        console.log(`- Missing Amenities: ${firstEdge.missingAmenities.length}`);
+      }
+      
+      if (isSponsoredEdge(firstEdge)) {
+        console.log(`- Sponsored: ${firstEdge.sponsoredSimilarityLabel}`);
+      }
       
       // Store the success
       results.searchRentals = { 
         success: true, 
-        message: `Successfully retrieved ${listings.length} listings` 
+        message: `Successfully retrieved ${edges.length} listings` 
       };
       
       // Use the first listing ID to test the rental details API
