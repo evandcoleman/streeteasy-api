@@ -283,24 +283,24 @@ describe("StreetEasyClient", () => {
                     propertyDetails: {
                         address: {
                             street: "123 Main St",
-                            unit: "4B"
+                            unit: "4B",
                         },
                         bedroomCount: 2,
                         fullBathroomCount: 1,
-                        halfBathroomCount: 0
+                        halfBathroomCount: 0,
                     },
                     pricing: {
                         price: 3500,
-                        noFee: true
-                    }
+                        noFee: true,
+                    },
                 },
                 buildingByRentalListingId: {
                     name: "Test Building",
                     type: "CONDO",
                     area: {
-                        name: "Manhattan"
-                    }
-                }
+                        name: "Manhattan",
+                    },
+                },
             };
             const mockClient = {
                 request: jest.fn().mockResolvedValue(mockResponse),
@@ -332,29 +332,29 @@ describe("StreetEasyClient", () => {
                     propertyDetails: {
                         address: {
                             street: "123 Main St",
-                            unit: null
+                            unit: null,
                         },
                         bedroomCount: 2,
                         fullBathroomCount: 1,
-                        halfBathroomCount: 0
+                        halfBathroomCount: 0,
                     },
                     pricing: {
                         price: 3500,
-                        noFee: true
+                        noFee: true,
                     },
                     media: {
                         photos: [],
-                        floorPlans: null
-                    }
+                        floorPlans: null,
+                    },
                 },
                 buildingByRentalListingId: {
                     name: "Test Building",
                     type: "CONDO",
                     area: {
-                        name: "Manhattan"
-                    }
+                        name: "Manhattan",
+                    },
                 },
-                getRelloRentalById: null
+                getRelloRentalById: null,
             };
             const mockClient = {
                 request: jest.fn().mockResolvedValue(mockResponse),
@@ -399,8 +399,8 @@ describe("StreetEasyClient", () => {
                         {
                             __typename: "RentalStatusChange",
                             status: "ACTIVE",
-                            changedAt: "2024-04-01T12:00:00Z"
-                        }
+                            changedAt: "2024-04-01T12:00:00Z",
+                        },
                     ],
                     createdAt: "2024-04-01T12:00:00Z",
                     updatedAt: "2024-04-01T12:00:00Z",
@@ -411,18 +411,18 @@ describe("StreetEasyClient", () => {
                         photos: [
                             {
                                 __typename: "Photo",
-                                key: "photo1"
-                            }
+                                key: "photo1",
+                            },
                         ],
                         floorPlans: [
                             {
                                 __typename: "FloorPlan",
-                                key: "floorplan1"
-                            }
+                                key: "floorplan1",
+                            },
                         ],
                         videos: [],
                         tour3dUrl: null,
-                        assetCount: 2
+                        assetCount: 2,
                     },
                     propertyDetails: {
                         __typename: "PropertyDetails",
@@ -434,7 +434,7 @@ describe("StreetEasyClient", () => {
                             city: "New York",
                             state: "NY",
                             zipCode: "10001",
-                            unit: "4B"
+                            unit: "4B",
                         },
                         roomCount: 3,
                         bedroomCount: 1,
@@ -447,20 +447,20 @@ describe("StreetEasyClient", () => {
                             doormanTypes: [],
                             parkingTypes: [],
                             sharedOutdoorSpaceTypes: [],
-                            storageSpaceTypes: []
+                            storageSpaceTypes: [],
                         },
                         features: {
                             __typename: "PropertyFeatures",
                             list: ["HARDWOOD_FLOORS", "DISHWASHER"],
                             fireplaceTypes: [],
                             privateOutdoorSpaceTypes: [],
-                            views: []
-                        }
+                            views: [],
+                        },
                     },
                     mlsNumber: null,
                     backOffice: {
                         __typename: "RentalBackOffice",
-                        brokerageListingId: null
+                        brokerageListingId: null,
                     },
                     pricing: {
                         __typename: "RentalPricing",
@@ -469,25 +469,25 @@ describe("StreetEasyClient", () => {
                         noFee: true,
                         price: 3500,
                         priceDelta: null,
-                        priceChanges: []
+                        priceChanges: [],
                     },
                     recentListingsPriceStats: {
                         __typename: "NeighborhoodPriceStats",
                         rentalPriceStats: {
                             __typename: "PriceStats",
-                            medianPrice: 3400
+                            medianPrice: 3400,
                         },
                         salePriceStats: {
                             __typename: "PriceStats",
-                            medianPrice: 750000
-                        }
+                            medianPrice: 750000,
+                        },
                     },
                     upcomingOpenHouses: [],
                     listingSource: {
                         __typename: "ListingSource",
-                        sourceType: "BROKER"
+                        sourceType: "BROKER",
                     },
-                    propertyHistory: []
+                    propertyHistory: [],
                 },
                 buildingByRentalListingId: {
                     __typename: "Building",
@@ -500,49 +500,49 @@ describe("StreetEasyClient", () => {
                     additionalDetails: {
                         __typename: "BuildingAdditionalDetails",
                         leasingStartDate: null,
-                        salesStartDate: null
+                        salesStartDate: null,
                     },
                     address: {
                         __typename: "Address",
                         street: "123 Main St",
                         city: "New York",
                         state: "NY",
-                        zipCode: "10001"
+                        zipCode: "10001",
                     },
                     heroImage: null,
                     media: {
                         __typename: "Media",
-                        photos: []
+                        photos: [],
                     },
                     complex: null,
                     area: {
                         __typename: "Area",
-                        name: "Manhattan"
+                        name: "Manhattan",
                     },
                     saleInventorySummary: {
                         __typename: "SaleInventorySummary",
-                        availableListingDigests: []
+                        availableListingDigests: [],
                     },
                     rentalInventorySummary: {
                         __typename: "RentalInventorySummary",
-                        availableListingDigests: []
+                        availableListingDigests: [],
                     },
                     isLandLease: null,
                     policies: null,
                     nearby: {
                         __typename: "Nearby",
-                        transitStations: []
-                    }
+                        transitStations: [],
+                    },
                 },
                 getBuildingExpressByRentalListingId: {
                     __typename: "BuildingExpress",
-                    nearbySchools: []
+                    nearbySchools: [],
                 },
                 getRelloRentalById: null,
                 getRentalListingExpressById: {
                     __typename: "RentalListingExpress",
-                    hasActiveBuildingShowcase: false
-                }
+                    hasActiveBuildingShowcase: false,
+                },
             };
             const mockClient = {
                 request: jest.fn().mockResolvedValue(mockResponse),
