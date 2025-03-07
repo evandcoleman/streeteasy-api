@@ -3,6 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const graphql_request_1 = require("graphql-request");
 const index_1 = require("../index");
 const queries_1 = require("../queries");
+// Type guard functions - imported from examples for testing
+function isOrganicOrFeaturedEdge(edge) {
+    return (edge.__typename === "OrganicRentalEdge" ||
+        edge.__typename === "FeaturedRentalEdge");
+}
+function isSponsoredEdge(edge) {
+    return edge.__typename === "SponsoredRentalEdge";
+}
 // Create a ClientError class for testing
 class ClientError extends Error {
     constructor(message, response, request) {
@@ -268,6 +276,757 @@ describe("StreetEasyClient", () => {
                     ...params,
                     adStrategy: "NONE",
                 },
+            });
+        });
+        // Additional tests for the new federated search rentals query structure
+        describe("Federated search edge types", () => {
+            beforeEach(() => {
+                client = new index_1.StreetEasyClient();
+            });
+            it("should handle OrganicRentalEdge type correctly", async () => {
+                const mockResponse = {
+                    searchRentals: {
+                        __typename: "SearchRentals",
+                        edges: [
+                            {
+                                __typename: "OrganicRentalEdge",
+                                node: {
+                                    __typename: "SearchRentalListing",
+                                    id: "123",
+                                    areaName: "Manhattan",
+                                    availableAt: "2023-12-15",
+                                    bedroomCount: 2,
+                                    buildingType: "RENTAL",
+                                    fullBathroomCount: 1,
+                                    furnished: false,
+                                    geoPoint: {
+                                        __typename: "GeoPoint",
+                                        latitude: 40.7128,
+                                        longitude: -74.006,
+                                    },
+                                    halfBathroomCount: 0,
+                                    hasTour3d: false,
+                                    hasVideos: false,
+                                    isNewDevelopment: false,
+                                    leadMedia: {
+                                        __typename: "LeadMedia",
+                                        photo: {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo123",
+                                        },
+                                    },
+                                    leaseTermMonths: 12,
+                                    livingAreaSize: 800,
+                                    mediaAssetCount: 5,
+                                    monthsFree: null,
+                                    noFee: true,
+                                    netEffectivePrice: null,
+                                    offMarketAt: null,
+                                    photos: [
+                                        {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo123",
+                                        },
+                                    ],
+                                    price: 3000,
+                                    priceChangedAt: null,
+                                    priceDelta: null,
+                                    slug: "2br-manhattan-apt",
+                                    sourceGroupLabel: "Agency",
+                                    sourceType: "BROKER",
+                                    status: "ACTIVE",
+                                    street: "123 Main St",
+                                    unit: "4B",
+                                    upcomingOpenHouse: null,
+                                    urlPath: "/rental/123",
+                                },
+                                amenitiesMatch: true,
+                                matchedAmenities: ["DISHWASHER", "ELEVATOR"],
+                                missingAmenities: [],
+                            },
+                        ],
+                        totalCount: 1,
+                    },
+                };
+                const mockClient = {
+                    request: jest.fn().mockResolvedValue(mockResponse),
+                };
+                graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+                client = new index_1.StreetEasyClient();
+                const params = {
+                    filters: {},
+                };
+                const response = await client.searchRentals(params);
+                expect(response.searchRentals.edges.length).toBe(1);
+                const edge = response.searchRentals.edges[0];
+                expect(edge.__typename).toBe("OrganicRentalEdge");
+                // Verify we can access OrganicRentalEdge specific properties
+                if (isOrganicOrFeaturedEdge(edge)) {
+                    expect(edge.amenitiesMatch).toBe(true);
+                    expect(edge.matchedAmenities).toContain("DISHWASHER");
+                    expect(edge.missingAmenities.length).toBe(0);
+                }
+                else {
+                    fail("Edge should be recognized as OrganicRentalEdge");
+                }
+                // Verify we can access node properties
+                expect(edge.node.id).toBe("123");
+                expect(edge.node.price).toBe(3000);
+                expect(edge.node.noFee).toBe(true);
+            });
+            it("should handle FeaturedRentalEdge type correctly", async () => {
+                const mockResponse = {
+                    searchRentals: {
+                        __typename: "SearchRentals",
+                        edges: [
+                            {
+                                __typename: "FeaturedRentalEdge",
+                                node: {
+                                    __typename: "SearchRentalListing",
+                                    id: "456",
+                                    areaName: "Brooklyn",
+                                    availableAt: "2023-11-01",
+                                    bedroomCount: 1,
+                                    buildingType: "CONDO",
+                                    fullBathroomCount: 1,
+                                    furnished: true,
+                                    geoPoint: {
+                                        __typename: "GeoPoint",
+                                        latitude: 40.6782,
+                                        longitude: -73.9442,
+                                    },
+                                    halfBathroomCount: 0,
+                                    hasTour3d: true,
+                                    hasVideos: true,
+                                    isNewDevelopment: true,
+                                    leadMedia: {
+                                        __typename: "LeadMedia",
+                                        photo: {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo456",
+                                        },
+                                    },
+                                    leaseTermMonths: 24,
+                                    livingAreaSize: 650,
+                                    mediaAssetCount: 10,
+                                    monthsFree: 1,
+                                    noFee: false,
+                                    netEffectivePrice: 2750,
+                                    offMarketAt: null,
+                                    photos: [
+                                        {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo456",
+                                        },
+                                    ],
+                                    price: 3000,
+                                    priceChangedAt: "2023-10-15",
+                                    priceDelta: -200,
+                                    slug: "1br-brooklyn-apt",
+                                    sourceGroupLabel: "Developer",
+                                    sourceType: "DEVELOPER",
+                                    status: "ACTIVE",
+                                    street: "456 Park Ave",
+                                    unit: "2A",
+                                    upcomingOpenHouse: {
+                                        __typename: "OpenHouseDigest",
+                                        startTime: "2023-10-20T12:00:00Z",
+                                        endTime: "2023-10-20T14:00:00Z",
+                                        appointmentOnly: false,
+                                    },
+                                    urlPath: "/rental/456",
+                                },
+                                amenitiesMatch: false,
+                                matchedAmenities: [],
+                                missingAmenities: ["DOORMAN"],
+                            },
+                        ],
+                        totalCount: 1,
+                    },
+                };
+                const mockClient = {
+                    request: jest.fn().mockResolvedValue(mockResponse),
+                };
+                graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+                client = new index_1.StreetEasyClient();
+                const params = {
+                    filters: {},
+                };
+                const response = await client.searchRentals(params);
+                expect(response.searchRentals.edges.length).toBe(1);
+                const edge = response.searchRentals.edges[0];
+                expect(edge.__typename).toBe("FeaturedRentalEdge");
+                // Verify we can access FeaturedRentalEdge specific properties
+                if (isOrganicOrFeaturedEdge(edge)) {
+                    expect(edge.amenitiesMatch).toBe(false);
+                    expect(edge.matchedAmenities.length).toBe(0);
+                    expect(edge.missingAmenities).toContain("DOORMAN");
+                }
+                else {
+                    fail("Edge should be recognized as FeaturedRentalEdge");
+                }
+                // Verify we can access new node properties
+                expect(edge.node.id).toBe("456");
+                expect(edge.node.furnished).toBe(true);
+                expect(edge.node.hasTour3d).toBe(true);
+                expect(edge.node.monthsFree).toBe(1);
+                expect(edge.node.netEffectivePrice).toBe(2750);
+                expect(edge.node.upcomingOpenHouse).toBeDefined();
+                expect(edge.node.upcomingOpenHouse?.appointmentOnly).toBe(false);
+            });
+            it("should handle SponsoredRentalEdge type correctly", async () => {
+                const mockResponse = {
+                    searchRentals: {
+                        __typename: "SearchRentals",
+                        edges: [
+                            {
+                                __typename: "SponsoredRentalEdge",
+                                node: {
+                                    __typename: "SearchRentalListing",
+                                    id: "789",
+                                    areaName: "Queens",
+                                    availableAt: null,
+                                    bedroomCount: 3,
+                                    buildingType: "MULTI_FAMILY",
+                                    fullBathroomCount: 2,
+                                    furnished: false,
+                                    geoPoint: {
+                                        __typename: "GeoPoint",
+                                        latitude: 40.7282,
+                                        longitude: -73.7949,
+                                    },
+                                    halfBathroomCount: 1,
+                                    hasTour3d: false,
+                                    hasVideos: false,
+                                    isNewDevelopment: false,
+                                    leadMedia: {
+                                        __typename: "LeadMedia",
+                                        photo: {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo789",
+                                        },
+                                    },
+                                    leaseTermMonths: null,
+                                    livingAreaSize: 1200,
+                                    mediaAssetCount: 3,
+                                    monthsFree: null,
+                                    noFee: false,
+                                    netEffectivePrice: null,
+                                    offMarketAt: null,
+                                    photos: [
+                                        {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo789",
+                                        },
+                                    ],
+                                    price: 4000,
+                                    priceChangedAt: null,
+                                    priceDelta: null,
+                                    slug: "3br-queens-apt",
+                                    sourceGroupLabel: "Premium Agency",
+                                    sourceType: "PREMIUM_BROKER",
+                                    status: "ACTIVE",
+                                    street: "789 Broadway",
+                                    unit: "3C",
+                                    upcomingOpenHouse: null,
+                                    urlPath: "/rental/789",
+                                },
+                                sponsoredSimilarityLabel: "Sponsored Result",
+                            },
+                        ],
+                        totalCount: 1,
+                    },
+                };
+                const mockClient = {
+                    request: jest.fn().mockResolvedValue(mockResponse),
+                };
+                graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+                client = new index_1.StreetEasyClient();
+                const params = {
+                    filters: {},
+                };
+                const response = await client.searchRentals(params);
+                expect(response.searchRentals.edges.length).toBe(1);
+                const edge = response.searchRentals.edges[0];
+                expect(edge.__typename).toBe("SponsoredRentalEdge");
+                // Verify we can access SponsoredRentalEdge specific properties
+                if (isSponsoredEdge(edge)) {
+                    expect(edge.sponsoredSimilarityLabel).toBe("Sponsored Result");
+                }
+                else {
+                    fail("Edge should be recognized as SponsoredRentalEdge");
+                }
+                // Verify type guard works as expected
+                expect(isOrganicOrFeaturedEdge(edge)).toBe(false);
+                expect(isSponsoredEdge(edge)).toBe(true);
+                // Verify we can access node properties
+                expect(edge.node.id).toBe("789");
+                expect(edge.node.bedroomCount).toBe(3);
+                expect(edge.node.fullBathroomCount).toBe(2);
+            });
+            it("should handle mixed edge types in search results", async () => {
+                const mockResponse = {
+                    searchRentals: {
+                        __typename: "SearchRentals",
+                        edges: [
+                            {
+                                __typename: "OrganicRentalEdge",
+                                node: {
+                                    __typename: "SearchRentalListing",
+                                    id: "123",
+                                    areaName: "Manhattan",
+                                    availableAt: "2023-12-15",
+                                    bedroomCount: 2,
+                                    buildingType: "RENTAL",
+                                    fullBathroomCount: 1,
+                                    furnished: false,
+                                    geoPoint: {
+                                        __typename: "GeoPoint",
+                                        latitude: 40.7128,
+                                        longitude: -74.006,
+                                    },
+                                    halfBathroomCount: 0,
+                                    hasTour3d: false,
+                                    hasVideos: false,
+                                    isNewDevelopment: false,
+                                    leadMedia: {
+                                        __typename: "LeadMedia",
+                                        photo: {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo123",
+                                        },
+                                    },
+                                    leaseTermMonths: 12,
+                                    livingAreaSize: 800,
+                                    mediaAssetCount: 5,
+                                    monthsFree: null,
+                                    noFee: true,
+                                    netEffectivePrice: null,
+                                    offMarketAt: null,
+                                    photos: [
+                                        {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo123",
+                                        },
+                                    ],
+                                    price: 3000,
+                                    priceChangedAt: null,
+                                    priceDelta: null,
+                                    slug: "2br-manhattan-apt",
+                                    sourceGroupLabel: "Agency",
+                                    sourceType: "BROKER",
+                                    status: "ACTIVE",
+                                    street: "123 Main St",
+                                    unit: "4B",
+                                    upcomingOpenHouse: null,
+                                    urlPath: "/rental/123",
+                                },
+                                amenitiesMatch: true,
+                                matchedAmenities: ["DISHWASHER"],
+                                missingAmenities: [],
+                            },
+                            {
+                                __typename: "SponsoredRentalEdge",
+                                node: {
+                                    __typename: "SearchRentalListing",
+                                    id: "789",
+                                    areaName: "Queens",
+                                    availableAt: null,
+                                    bedroomCount: 3,
+                                    buildingType: "MULTI_FAMILY",
+                                    fullBathroomCount: 2,
+                                    furnished: false,
+                                    geoPoint: {
+                                        __typename: "GeoPoint",
+                                        latitude: 40.7282,
+                                        longitude: -73.7949,
+                                    },
+                                    halfBathroomCount: 1,
+                                    hasTour3d: false,
+                                    hasVideos: false,
+                                    isNewDevelopment: false,
+                                    leadMedia: {
+                                        __typename: "LeadMedia",
+                                        photo: {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo789",
+                                        },
+                                    },
+                                    leaseTermMonths: null,
+                                    livingAreaSize: 1200,
+                                    mediaAssetCount: 3,
+                                    monthsFree: null,
+                                    noFee: false,
+                                    netEffectivePrice: null,
+                                    offMarketAt: null,
+                                    photos: [
+                                        {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo789",
+                                        },
+                                    ],
+                                    price: 4000,
+                                    priceChangedAt: null,
+                                    priceDelta: null,
+                                    slug: "3br-queens-apt",
+                                    sourceGroupLabel: "Premium Agency",
+                                    sourceType: "PREMIUM_BROKER",
+                                    status: "ACTIVE",
+                                    street: "789 Broadway",
+                                    unit: "3C",
+                                    upcomingOpenHouse: null,
+                                    urlPath: "/rental/789",
+                                },
+                                sponsoredSimilarityLabel: "Sponsored Result",
+                            },
+                            {
+                                __typename: "FeaturedRentalEdge",
+                                node: {
+                                    __typename: "SearchRentalListing",
+                                    id: "456",
+                                    areaName: "Brooklyn",
+                                    availableAt: "2023-11-01",
+                                    bedroomCount: 1,
+                                    buildingType: "CONDO",
+                                    fullBathroomCount: 1,
+                                    furnished: true,
+                                    geoPoint: {
+                                        __typename: "GeoPoint",
+                                        latitude: 40.6782,
+                                        longitude: -73.9442,
+                                    },
+                                    halfBathroomCount: 0,
+                                    hasTour3d: true,
+                                    hasVideos: true,
+                                    isNewDevelopment: true,
+                                    leadMedia: {
+                                        __typename: "LeadMedia",
+                                        photo: {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo456",
+                                        },
+                                    },
+                                    leaseTermMonths: 24,
+                                    livingAreaSize: 650,
+                                    mediaAssetCount: 10,
+                                    monthsFree: 1,
+                                    noFee: false,
+                                    netEffectivePrice: 2750,
+                                    offMarketAt: null,
+                                    photos: [
+                                        {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo456",
+                                        },
+                                    ],
+                                    price: 3000,
+                                    priceChangedAt: "2023-10-15",
+                                    priceDelta: -200,
+                                    slug: "1br-brooklyn-apt",
+                                    sourceGroupLabel: "Developer",
+                                    sourceType: "DEVELOPER",
+                                    status: "ACTIVE",
+                                    street: "456 Park Ave",
+                                    unit: "2A",
+                                    upcomingOpenHouse: {
+                                        __typename: "OpenHouseDigest",
+                                        startTime: "2023-10-20T12:00:00Z",
+                                        endTime: "2023-10-20T14:00:00Z",
+                                        appointmentOnly: false,
+                                    },
+                                    urlPath: "/rental/456",
+                                },
+                                amenitiesMatch: false,
+                                matchedAmenities: [],
+                                missingAmenities: ["DOORMAN"],
+                            },
+                        ],
+                        totalCount: 3,
+                    },
+                };
+                const mockClient = {
+                    request: jest.fn().mockResolvedValue(mockResponse),
+                };
+                graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+                client = new index_1.StreetEasyClient();
+                const params = {
+                    filters: {},
+                };
+                const response = await client.searchRentals(params);
+                expect(response.searchRentals.edges.length).toBe(3);
+                // Process each edge by type
+                let organicCount = 0;
+                let featuredCount = 0;
+                let sponsoredCount = 0;
+                response.searchRentals.edges.forEach((edge) => {
+                    if (edge.__typename === "OrganicRentalEdge") {
+                        organicCount++;
+                        expect(isOrganicOrFeaturedEdge(edge)).toBe(true);
+                        expect(isSponsoredEdge(edge)).toBe(false);
+                    }
+                    else if (edge.__typename === "FeaturedRentalEdge") {
+                        featuredCount++;
+                        expect(isOrganicOrFeaturedEdge(edge)).toBe(true);
+                        expect(isSponsoredEdge(edge)).toBe(false);
+                    }
+                    else if (edge.__typename === "SponsoredRentalEdge") {
+                        sponsoredCount++;
+                        expect(isOrganicOrFeaturedEdge(edge)).toBe(false);
+                        expect(isSponsoredEdge(edge)).toBe(true);
+                    }
+                });
+                expect(organicCount).toBe(1);
+                expect(featuredCount).toBe(1);
+                expect(sponsoredCount).toBe(1);
+            });
+            it("should handle new fields in rental listings", async () => {
+                const mockResponse = {
+                    searchRentals: {
+                        __typename: "SearchRentals",
+                        edges: [
+                            {
+                                __typename: "OrganicRentalEdge",
+                                node: {
+                                    __typename: "SearchRentalListing",
+                                    id: "123",
+                                    areaName: "Manhattan",
+                                    availableAt: "2023-12-15",
+                                    bedroomCount: 2,
+                                    buildingType: "RENTAL",
+                                    fullBathroomCount: 1,
+                                    furnished: true,
+                                    geoPoint: {
+                                        __typename: "GeoPoint",
+                                        latitude: 40.7128,
+                                        longitude: -74.006,
+                                    },
+                                    halfBathroomCount: 0,
+                                    hasTour3d: true,
+                                    hasVideos: true,
+                                    isNewDevelopment: true,
+                                    leadMedia: {
+                                        __typename: "LeadMedia",
+                                        photo: {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo123",
+                                        },
+                                        floorPlan: {
+                                            __typename: "LeadMediaFloorPlan",
+                                            key: "floorplan123",
+                                        },
+                                    },
+                                    leaseTermMonths: 12,
+                                    livingAreaSize: 800,
+                                    mediaAssetCount: 5,
+                                    monthsFree: 1,
+                                    noFee: true,
+                                    netEffectivePrice: 2750,
+                                    offMarketAt: null,
+                                    photos: [
+                                        {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo123",
+                                        },
+                                    ],
+                                    price: 3000,
+                                    priceChangedAt: "2023-10-01",
+                                    priceDelta: -200,
+                                    slug: "2br-manhattan-apt",
+                                    sourceGroupLabel: "Agency",
+                                    sourceType: "BROKER",
+                                    status: "ACTIVE",
+                                    street: "123 Main St",
+                                    unit: "4B",
+                                    upcomingOpenHouse: {
+                                        __typename: "OpenHouseDigest",
+                                        startTime: "2023-10-20T10:00:00Z",
+                                        endTime: "2023-10-20T12:00:00Z",
+                                        appointmentOnly: true,
+                                    },
+                                    urlPath: "/rental/123",
+                                },
+                                amenitiesMatch: true,
+                                matchedAmenities: ["DISHWASHER", "ELEVATOR"],
+                                missingAmenities: [],
+                            },
+                        ],
+                        totalCount: 1,
+                    },
+                };
+                const mockClient = {
+                    request: jest.fn().mockResolvedValue(mockResponse),
+                };
+                graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+                client = new index_1.StreetEasyClient();
+                const params = {
+                    filters: {},
+                };
+                const response = await client.searchRentals(params);
+                const listing = response.searchRentals.edges[0].node;
+                // Test all new fields
+                expect(listing.availableAt).toBe("2023-12-15");
+                expect(listing.furnished).toBe(true);
+                expect(listing.hasTour3d).toBe(true);
+                expect(listing.hasVideos).toBe(true);
+                expect(listing.isNewDevelopment).toBe(true);
+                expect(listing.leadMedia.floorPlan).toBeDefined();
+                expect(listing.leadMedia.floorPlan?.key).toBe("floorplan123");
+                expect(listing.leaseTermMonths).toBe(12);
+                expect(listing.livingAreaSize).toBe(800);
+                expect(listing.mediaAssetCount).toBe(5);
+                expect(listing.monthsFree).toBe(1);
+                expect(listing.netEffectivePrice).toBe(2750);
+                expect(listing.priceChangedAt).toBe("2023-10-01");
+                expect(listing.priceDelta).toBe(-200);
+                expect(listing.slug).toBe("2br-manhattan-apt");
+                expect(listing.sourceType).toBe("BROKER");
+                expect(listing.status).toBe("ACTIVE");
+                expect(listing.upcomingOpenHouse).toBeDefined();
+                expect(listing.upcomingOpenHouse?.appointmentOnly).toBe(true);
+            });
+        });
+        describe("Type Guards", () => {
+            it("should correctly identify OrganicRentalEdge", () => {
+                const edge = { __typename: "OrganicRentalEdge" };
+                expect(isOrganicOrFeaturedEdge(edge)).toBe(true);
+                expect(isSponsoredEdge(edge)).toBe(false);
+            });
+            it("should correctly identify FeaturedRentalEdge", () => {
+                const edge = { __typename: "FeaturedRentalEdge" };
+                expect(isOrganicOrFeaturedEdge(edge)).toBe(true);
+                expect(isSponsoredEdge(edge)).toBe(false);
+            });
+            it("should correctly identify SponsoredRentalEdge", () => {
+                const edge = { __typename: "SponsoredRentalEdge" };
+                expect(isOrganicOrFeaturedEdge(edge)).toBe(false);
+                expect(isSponsoredEdge(edge)).toBe(true);
+            });
+            it("should handle unknown edge types gracefully", () => {
+                const edge = { __typename: "UnknownEdgeType" };
+                expect(isOrganicOrFeaturedEdge(edge)).toBe(false);
+                expect(isSponsoredEdge(edge)).toBe(false);
+            });
+        });
+        describe("Error handling", () => {
+            it("should handle incomplete edge data gracefully", async () => {
+                const mockResponse = {
+                    searchRentals: {
+                        __typename: "SearchRentals",
+                        edges: [
+                            {
+                                __typename: "OrganicRentalEdge",
+                                // Missing amenitiesMatch, matchedAmenities, missingAmenities
+                                node: {
+                                    __typename: "SearchRentalListing",
+                                    id: "123",
+                                    areaName: "Manhattan",
+                                    bedroomCount: 2,
+                                    buildingType: "RENTAL",
+                                    fullBathroomCount: 1,
+                                    geoPoint: {
+                                        __typename: "GeoPoint",
+                                        latitude: 40.7128,
+                                        longitude: -74.006,
+                                    },
+                                    halfBathroomCount: 0,
+                                    leadMedia: {
+                                        __typename: "LeadMedia",
+                                        photo: {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo123",
+                                        },
+                                    },
+                                    noFee: true,
+                                    price: 3000,
+                                    sourceGroupLabel: "Agency",
+                                    street: "123 Main St",
+                                    unit: "4B",
+                                    urlPath: "/rental/123",
+                                },
+                            },
+                        ],
+                        totalCount: 1,
+                    },
+                };
+                const mockClient = {
+                    request: jest.fn().mockResolvedValue(mockResponse),
+                };
+                graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+                client = new index_1.StreetEasyClient();
+                const params = {
+                    filters: {},
+                };
+                // This should not throw even though the data is incomplete
+                const response = await client.searchRentals(params);
+                expect(response.searchRentals.edges.length).toBe(1);
+                const edge = response.searchRentals.edges[0];
+                // We can still access the node data
+                expect(edge.node.id).toBe("123");
+                expect(edge.node.price).toBe(3000);
+                // But edge-specific properties might be undefined
+                expect(edge.amenitiesMatch).toBeUndefined();
+                expect(edge.matchedAmenities).toBeUndefined();
+            });
+            it("should handle unknown edge types gracefully", async () => {
+                const mockResponse = {
+                    searchRentals: {
+                        __typename: "SearchRentals",
+                        edges: [
+                            {
+                                __typename: "UnknownRentalEdge",
+                                node: {
+                                    __typename: "SearchRentalListing",
+                                    id: "123",
+                                    areaName: "Manhattan",
+                                    bedroomCount: 2,
+                                    buildingType: "RENTAL",
+                                    fullBathroomCount: 1,
+                                    geoPoint: {
+                                        __typename: "GeoPoint",
+                                        latitude: 40.7128,
+                                        longitude: -74.006,
+                                    },
+                                    halfBathroomCount: 0,
+                                    leadMedia: {
+                                        __typename: "LeadMedia",
+                                        photo: {
+                                            __typename: "LeadMediaPhoto",
+                                            key: "photo123",
+                                        },
+                                    },
+                                    noFee: true,
+                                    price: 3000,
+                                    sourceGroupLabel: "Agency",
+                                    street: "123 Main St",
+                                    unit: "4B",
+                                    urlPath: "/rental/123",
+                                },
+                                someProperty: "some value",
+                            },
+                        ],
+                        totalCount: 1,
+                    },
+                };
+                const mockClient = {
+                    request: jest.fn().mockResolvedValue(mockResponse),
+                };
+                graphql_request_1.GraphQLClient.mockImplementation(() => mockClient);
+                client = new index_1.StreetEasyClient();
+                const params = {
+                    filters: {},
+                };
+                // This should not throw even with an unknown edge type
+                const response = await client.searchRentals(params);
+                expect(response.searchRentals.edges.length).toBe(1);
+                const edge = response.searchRentals.edges[0];
+                // Type guards should return false
+                expect(isOrganicOrFeaturedEdge(edge)).toBe(false);
+                expect(isSponsoredEdge(edge)).toBe(false);
+                // But node data should still be accessible
+                expect(edge.node.id).toBe("123");
+                expect(edge.node.price).toBe(3000);
+                // And custom properties on the unknown edge type
+                expect(edge.someProperty).toBe("some value");
             });
         });
     });
