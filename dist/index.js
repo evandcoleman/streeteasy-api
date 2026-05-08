@@ -22,6 +22,7 @@ class StreetEasyClient {
     constructor(config = {}) {
         this.endpoint = "https://api-v6.streeteasy.com/";
         this.client = new graphql_request_1.GraphQLClient(config.endpoint || this.endpoint, {
+            fetch: config.fetch,
             headers: {
                 Host: "api-v6.streeteasy.com",
                 Connection: "keep-alive",

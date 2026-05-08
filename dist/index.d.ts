@@ -2,6 +2,12 @@ import { DocumentNode } from "graphql";
 import { Variables, SearchRentalsInput, SearchRentalsResponse, RentalListingDetailsResponse } from "./types";
 export interface StreetEasyConfig {
     endpoint?: string;
+    /**
+     * Custom fetch implementation. Useful when the default Node fetch is
+     * blocked by anti-bot protection (e.g. PerimeterX), and you need to
+     * route requests through a TLS-impersonating client.
+     */
+    fetch?: typeof fetch;
 }
 export declare class StreetEasyClient {
     private readonly client;

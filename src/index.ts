@@ -13,6 +13,12 @@ import { v4 as uuidv4 } from "uuid";
 
 export interface StreetEasyConfig {
   endpoint?: string;
+  /**
+   * Custom fetch implementation. Useful when the default Node fetch is
+   * blocked by anti-bot protection (e.g. PerimeterX), and you need to
+   * route requests through a TLS-impersonating client.
+   */
+  fetch?: typeof fetch;
 }
 
 export class StreetEasyClient {
@@ -21,6 +27,7 @@ export class StreetEasyClient {
 
   constructor(config: StreetEasyConfig = {}) {
     this.client = new GraphQLClient(config.endpoint || this.endpoint, {
+      fetch: config.fetch,
       headers: {
         Host: "api-v6.streeteasy.com",
         Connection: "keep-alive",

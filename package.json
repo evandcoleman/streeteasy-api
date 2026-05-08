@@ -37,6 +37,7 @@
     "nyc"
   ],
   "devDependencies": {
+    "@qnaplus/node-curl-impersonate": "^1.0.2",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.24",
     "@types/uuid": "^10.0.0",

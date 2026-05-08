@@ -1,6 +1,7 @@
 import { StreetEasyClient } from '../src';
 import { Areas } from '../src/constants';
-import { SearchRentalListing, OrganicRentalEdge, FeaturedRentalEdge, SponsoredRentalEdge, RentalEdge } from '../src/types';
+import { OrganicRentalEdge, FeaturedRentalEdge, SponsoredRentalEdge, RentalEdge } from '../src/types';
+import { curlImpersonateFetch } from './lib/curl-impersonate-fetch';
 
 // Type guard functions
 function isOrganicOrFeaturedEdge(edge: RentalEdge): edge is OrganicRentalEdge | FeaturedRentalEdge {
@@ -18,8 +19,12 @@ function isSponsoredEdge(edge: RentalEdge): edge is SponsoredRentalEdge {
 async function main() {
   console.log('Starting StreetEasy API integration tests...');
   
-  // Create a new client
-  const client = new StreetEasyClient();
+  // Use a curl-impersonate-backed fetch so CI runners aren't blocked by
+  // PerimeterX TLS fingerprinting. Disable with USE_NATIVE_FETCH=1.
+  const useNative = process.env.USE_NATIVE_FETCH === "1";
+  const client = new StreetEasyClient(
+    useNative ? {} : { fetch: curlImpersonateFetch as unknown as typeof fetch },
+  );
   const results = {
     searchRentals: { success: false, message: '' },
     getRentalListingDetails: { success: false, message: '' }
